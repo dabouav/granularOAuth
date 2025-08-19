@@ -29,6 +29,7 @@
  * }
  */
 
+const AUTH_APP_NAME = '<CHANGE TO NAME OF YOUR APP>';
 
 /**
  * Call this function at the start of any entry point into your app that
@@ -40,7 +41,7 @@
  */
 function authHandleMissingScopeGrants() {
   if (!authUserHasGrantedAllScopes()) { 
-    authShowAllScopesRequiredMessage();
+    _showAllScopesRequiredMessage();
     return true;
   }
 
@@ -66,21 +67,6 @@ function authUserHasGrantedAllScopes() {
   return false;
 }
 
-/* Checks if the script.container.ui is present among the user granted scopes, and ergo
- * this app can show the user HTML based content in a modal or the sidepanel.
- *
- * return {Boolean}
- */
-function authAppCanDisplayUIContent() {
-  let uiScopeIsMissing = authCheckForMissingScope('https://www.googleapis.com/auth/script.container.ui');
-
-  if (uiScopeIsMissing) {
-    return false;
-  }
-
-  return true;
-}
-
 /* Checks if the passed scope is missing from the user granted scopes.
  *
  * @param {String} scopeId Full path of OAuth scope being asked about.
@@ -100,36 +86,51 @@ function authCheckForMissingScope(scopeId) {
   return false;
 }
 
+//// INTERNAL helper functions below this point ////
+
+/* Checks if the script.container.ui is present among the user granted scopes, and ergo
+ * this app can show the user HTML based content in a modal or the sidepanel.
+ *
+ * return {Boolean}
+ */
+function _appCanDisplayUIContent() {
+  let uiScopeIsMissing = authCheckForMissingScope('https://www.googleapis.com/auth/script.container.ui');
+
+  if (uiScopeIsMissing) {
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * Shows a message box asking the user to re-authorize remaining scopes 
  * needed by the app, with a link to click on.
  *
  * return {Boolean}.
  */
-function authShowAllScopesRequiredMessage() {
-  const appName = 'Flubaroo';
-
+function _showAllScopesRequiredMessage() {
   let authInfo = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
   let reAuthUrl = authInfo.getAuthorizationUrl();
 
   let title = 'Further Authorization Required';
 
-  if (authAppCanDisplayUIContent()) {
-    let message = `To operate properly, ${appName} requires that you approve <u>all</u>  \
+  if (_appCanDisplayUIContent()) {
+    let message = `To operate properly, ${AUTH_APP_NAME} requires that you approve <u>all</u>  \
                       of its listed permissions (scopes) during installation. \
-                      <p>Please click the link below to re-authorize ${appName}, and \
+                      <p>Please click the link below to re-authorize ${AUTH_APP_NAME}, and \
                       be sure to select all of the permissions listed there.
-                      Afterwards, close this window and access ${appName} again.</p> \
+                      Afterwards, close this window and access ${AUTH_APP_NAME} again.</p> \
                       <a target="_blank" href="${reAuthUrl}">Authorize Now</a>`;
 
-    showHtmlNotification(title, message);
+    _showHtmlNotification(title, message);
   }
   else {
-    let message = `${title}\\n\\nTo operate properly, ${appName} requires that you approve all  \
+    let message = `${title}\\n\\nTo operate properly, ${AUTH_APP_NAME} requires that you approve all  \
                       of its listed permissions (scopes) during installation. \
-                      \\n\\nPlease visit the link below in a new tab to re-authorize ${appName}, and \
+                      \\n\\nPlease visit the link below in a new tab to re-authorize ${AUTH_APP_NAME}, and \
                       be sure to select all of the permissions listed there.
-                      Afterwards, close this window and access ${appName} again.\\n\\n${reAuthUrl}`;
+                      Afterwards, close this window and access ${AUTH_APP_NAME} again.\\n\\n${reAuthUrl}`;
     Browser.msgBox(message);
   }
 }
@@ -144,7 +145,7 @@ function authShowAllScopesRequiredMessage() {
  * falls back to native Browser.msgBox(), from which user will have to copy/paste
  * re-auth link.
  */
-function showHtmlNotification(title, message) {
+function _showHtmlNotification(title, message) {
   let html = _createHtmlMessageBox(title, message);
 
   // Show the HTML message box. If a Forms Add-on, instead use FormsApp.getUi(), etc.
