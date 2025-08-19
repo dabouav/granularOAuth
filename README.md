@@ -4,7 +4,6 @@ A collection of helpful functions for Apps Script powered scripts, Add-ons and C
 ## List of functions:
 + authHandleMissingScopeGrants(): Returns true if some or all scopes in the manifest have not been granted, and a prompt has been shown to the end-user to re-authorize. Returns false otherwise.
 + authUserHasGrantedAllScopes(): Returns true if some or all scopes in the manifest have not been granted. Returns false otherwise.
-+ authAppCanDisplayUIContent(): Returns true if the scope 'https://www.googleapis.com/auth/script.container.ui' has been granted by the end-user.
 + authCheckForMissingScope(scopeId): Returns true if the passed scope ID (i.e. 'https://www.googleapis.com/auth/drive.file') is missing from those granted by the end-user.
 
 ## Configuration:
@@ -15,6 +14,7 @@ You will need to copy/paste the code in granularAuth.gs into your Apps Script pr
 
 ## Example use:
 
+```
 // Check if user has granted/authorized *all* scopes listed in this 
 // project's manifest, and if not, provide them a link to grant the
 // remaining ones. This check should be done at the start of any entry 
@@ -31,3 +31,4 @@ function menuItemStartAction() {
  // continue with normal execution
  handleStartAction();
 }
+```
