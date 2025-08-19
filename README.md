@@ -32,3 +32,5 @@ function menuItemStartAction() {
  handleStartAction();
 }
 ```
+## Sample of prompt seen by the end-user:
+![Sample of prompt seen by the end-user](prompt.png)
