@@ -31,6 +31,11 @@
 
 const AUTH_APP_NAME = '<CHANGE TO NAME OF YOUR APP>';
 
+// IMPORTANT: To avoid requesting unnecessary scopes, list ONLY the 
+// host applications this add-on is designed for.
+// For example, for a Sheets-only add-on, use: [SpreadsheetApp]
+const ADD_ON_CONTAINERS = [SpreadsheetApp, DocumentApp, SlidesApp, FormApp];
+
 /**
  * Call this function at the start of any entry point into your app that
  * a brand new user may execute (i.e. Menu items for them to start 
@@ -126,12 +131,19 @@ function _showAllScopesRequiredMessage() {
     _showHtmlNotification(title, message);
   }
   else {
+    const ui = _getActiveUi();
     let message = `${title}\\n\\nTo operate properly, ${AUTH_APP_NAME} requires that you approve all  \
                       of its listed permissions (scopes) during installation. \
                       \\n\\nPlease visit the link below in a new tab to re-authorize ${AUTH_APP_NAME}, and \
                       be sure to select all of the permissions listed there.
                       Afterwards, close this window and access ${AUTH_APP_NAME} again.\\n\\n${reAuthUrl}`;
-    Browser.msgBox(message);
+    if (ui) {
+        // Use the cross-compatible Ui.alert() for the fallback message.
+        ui.alert(title, message, ui.ButtonSet.OK);
+    } else {
+        // This case is highly unlikely in a functioning add-on.
+        console.error("Could not display the authorization message because no active UI was found.");
+    }
   }
 }
 
@@ -148,11 +160,45 @@ function _showAllScopesRequiredMessage() {
 function _showHtmlNotification(title, message) {
   let html = _createHtmlMessageBox(title, message);
 
-  // Show the HTML message box. If a Forms Add-on, instead use FormsApp.getUi(), etc.
-  SpreadsheetApp.getUi().showModalDialog(html, title);
+  const ui = _getActiveUi();
+
+  if (ui) {
+    ui.showModalDialog(html, title);
+  } else {
+    // Fallback if no UI can be determined, though this is unlikely in an add-on.
+    console.error("Could not display the authorization message in a dialog.");
+  }
 }
 
+/**
+ * Gets the UI object for the active container based on the ADD_ON_CONTAINERS constant.
+ * This developer-configured approach prevents requesting unnecessary scopes.
+ * @returns {GoogleAppsScript.Base.Ui|null} The UI object for the active editor, or null if none is found.
+ */
+function _getActiveUi() {
+  const activeApp = ADD_ON_CONTAINERS.find((app) => {
+    try {
+      // The getUi() method will only succeed in the active container.
+      // This check confirms the app object exists and has the getUi method.
+      return app && typeof app.getUi === 'function' && app.getUi();
+    } catch (f) {
+      // An error will be thrown if trying to access an inactive service UI.
+      return false;
+    }
+  });
 
+  if (activeApp) {
+    return activeApp.getUi();
+  }
+  return null;
+};
+
+/**
+ * Creates the HTML output for the message box.
+ * @param {string} title The title for the HTML document.
+ * @param {string} message The HTML message content.
+ * @returns {GoogleAppsScript.HTML.HtmlOutput} The configured HtmlOutput object.
+ */
 function _createHtmlMessageBox(title, message) {
 
   let html = HtmlService.createHtmlOutput()
