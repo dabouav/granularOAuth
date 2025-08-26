@@ -8,8 +8,9 @@ A collection of helpful functions for Apps Script powered scripts, Add-ons and C
 
 ## Configuration:
 
-You will need to copy/paste the code in granularAuth.gs into your Apps Script project, and then make the following changes:c
+You will need to copy/paste the code in granularAuth.gs into your Apps Script project, and then make the following changes:
 + Change the const AUTH_APP_NAME at the top of the file to reflect your app's name.
++ If needed, change the objects listed in the ADD_ON_CONTAINERS array to reflect the Editors your Add-on operates in.
 + If desired, update and/or localize the message strings in the function _showAllScopesRequiredMessage().
 
 ## Example use:
