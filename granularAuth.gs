@@ -132,11 +132,11 @@ function _showAllScopesRequiredMessage() {
   }
   else {
     const ui = _getActiveUi();
-    let message = `${title}\\n\\nTo operate properly, ${AUTH_APP_NAME} requires that you approve all  \
+    let message = `${title}\n\nTo operate properly, ${AUTH_APP_NAME} requires that you approve all  \
                       of its listed permissions (scopes) during installation. \
-                      \\n\\nPlease visit the link below in a new tab to re-authorize ${AUTH_APP_NAME}, and \
+                      \n\nPlease visit the link below in a new tab to re-authorize ${AUTH_APP_NAME}, and \
                       be sure to select all of the permissions listed there.
-                      Afterwards, close this window and access ${AUTH_APP_NAME} again.\\n\\n${reAuthUrl}`;
+                      Afterwards, close this window and access ${AUTH_APP_NAME} again.\n\n${reAuthUrl}`;
     if (ui) {
         // Use the cross-compatible Ui.alert() for the fallback message.
         ui.alert(title, message, ui.ButtonSet.OK);
